@@ -1,0 +1,1 @@
+A library to enable simple character interation using Three.js
