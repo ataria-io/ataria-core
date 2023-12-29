@@ -186,16 +186,28 @@ class SceneManager
         let distance = options?.distance ? options.distance : 1.3;
 
         //distance = distance * (THREE.MathUtils.radToDeg(character.model.rotation.y) < 180 ? -1 : 1);
-        //let multiplier = THREE.MathUtils.radToDeg(character.model.rotation.y) > 90 || THREE.MathUtils.radToDeg(character.model.rotation.y) < 270 ? 1 : -1
+        let characterRotationDegs = THREE.MathUtils.radToDeg(character.model.rotation.y) % 360;
+        let characterRotation = character.model.rotation.y;
+        //let xMultiplier = characterRotationDegs > 180 ? -1 : 1;
+        //let zMultiplier = characterRotationDegs > 90 && characterRotationDegs < 270 ? -1 : 1;
 
-        let targetX = character.model.position.x + (distance * Math.sin(character.model.rotation.y));
-        let targetZ = character.model.position.z + (distance * Math.cos(character.model.rotation.y));
-        targetX = targetX * (THREE.MathUtils.radToDeg(character.model.rotation.y) > 90 || THREE.MathUtils.radToDeg(character.model.rotation.y) < 270 ? 1 : -1);
-        targetZ = targetZ * (THREE.MathUtils.radToDeg(character.model.rotation.y) > 90 || THREE.MathUtils.radToDeg(character.model.rotation.y) < 270 ? 1 : -1);
-        //targetZ = targetZ * multiplier;
+        //let targetX = xMultiplier * (character.model.position.x + (distance * Math.sin(characterRotation)));
+        //let targetZ = zMultiplier * (character.model.position.z + (distance * Math.cos(characterRotation)));
+        
+        // Find point from character position at character rotation angle at distance
+        let targetZ = Math.cos(characterRotationDegs * Math.PI/180) * distance + character.model.position.z;
+        let targetX = Math.sin(characterRotationDegs * Math.PI/180) * distance + character.model.position.x;
         
         let modelEyeHeight = character.modelType == character.model.MODEL_TYPE_READY_PLAYER_ME ? character.modelBody.eyeLeft.geometry.boundingBox.max.y : 1.4;
         let lookAtPosition = new THREE.Vector3(character.model.position.x, modelEyeHeight + 0.2, character.model.position.z);
+
+        
+        if(this.options.debug)
+        {   
+            this.addMarker({x: targetX, y: 0, z: targetZ}, characterRotation, "red");
+
+        }
+
 
         this.camera.position.set(targetX, modelEyeHeight + 0.2, targetZ);
         this.camera.lookAt(lookAtPosition);
@@ -213,10 +225,14 @@ class SceneManager
 
         let midpointX = (character1.model.position.x + character2.model.position.x) / 2;
         let midpointZ = (character1.model.position.z + character2.model.position.z) / 2;
-        //let multiplier = THREE.MathUtils.radToDeg(character1.model.rotation.y) < 180 ? 1 : -1;
-        let multiplier = 1;
+        let multiplier = THREE.MathUtils.radToDeg(character1.model.rotation.y) > 90 && THREE.MathUtils.radToDeg(character1.model.rotation.y) < 270 ? -1 : 1;
+        //let multiplier = 1;
+        
+        this.debug(`Angle between characters ${characterName1} and ${characterName2}: `, 
+            (Math.atan2(character1.model.position.x - character2.model.position.x, character1.model.position.z - character2.model.position.z) * 180 / Math.PI));
+        
         let cameraRotationDegs = (multiplier * 90) + (Math.atan2(character1.model.position.x - character2.model.position.x, character1.model.position.z - character2.model.position.z) * 180 / Math.PI);
-        let cameraRotation = THREE.MathUtils.degToRad(cameraRotationDegs);
+        //let cameraRotation = THREE.MathUtils.degToRad(cameraRotationDegs);
 
         let characterDistance = Math.sqrt((character2.model.position.x - character1.model.position.x)*(character2.model.position.x - character1.model.position.x) + 
             (character2.model.position.z - character1.model.position.z)*(character2.model.position.z - character1.model.position.z));
@@ -224,10 +240,10 @@ class SceneManager
         let distance = characterDistance * options?.distanceFactor ? options.distanceFactor : 5;
         
         // Find point from midpoint at distance along calculated angle
-        let targetX = multiplier * (midpointX + (distance * Math.sin(cameraRotation)));
-        let targetZ = multiplier * (midpointZ + (distance * Math.cos(cameraRotation)));
+        let targetZ = Math.cos(cameraRotationDegs * Math.PI/180) * distance + midpointZ;
+        let targetX = Math.sin(cameraRotationDegs * Math.PI/180) * distance + midpointX;
 
-        console.log(`Midpoint between ${characterName1} and ${characterName2} is (${midpointX}, ${midpointZ}).  Camera rotation is ${cameraRotationDegs}.  Character distance is ${characterDistance}`);
+        this.debug(`Midpoint between ${characterName1} and ${characterName2} is (${midpointX}, ${midpointZ}).  Camera rotation is ${cameraRotationDegs}.  Character distance is ${characterDistance}`);
 
         let modelEyeHeight = character1.modelType == character1.model.MODEL_TYPE_READY_PLAYER_ME ? character1.modelBody.eyeLeft.geometry.boundingBox.max.y : 1.4;
 
@@ -262,6 +278,21 @@ class SceneManager
         let character2 = this.characters[characterName2];
         
         character1.modelSkeleton.Neck.lookAt(character2.model.position);
+
+    }
+
+
+    addMarker(position, rotation, color)
+    {
+        const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2); 
+        const material = new THREE.MeshBasicMaterial({color: color}); 
+        const cube = new THREE.Mesh(geometry, material); 
+        
+        this.scene.add(cube);
+        cube.position.set(position.x, position.y, position.z);
+        cube.rotation.y = rotation;
+
+        this.debug("Added marker: ", cube);
 
     }
 
