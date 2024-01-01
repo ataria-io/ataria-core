@@ -8,6 +8,7 @@ import * as ATARIA from "ataria";
 class Character
 {
     MODEL_TYPE_READY_PLAYER_ME = "readyPlayerMe";
+    MODEL_TYPE_AVATURN = "avaturn";
 
     DEFAULT_CROSSFADE_SECS = 0.5;
 
@@ -77,6 +78,28 @@ class Character
             this.modelBody.footwear = this.model.getObjectByName("Wolf3D_Outfit_Footwear");
             this.modelBody.outfitTop = this.model.getObjectByName("Wolf3D_Outfit_Top");
             this.modelBody.hair = this.model.getObjectByName("Wolf3D_Hair");
+            
+            this.modelSkeleton.Neck = this.model.getObjectByName("Neck");
+
+        }
+        else if(this.model.getObjectByName("avaturn_hair_0"))
+        {
+            this.debug(`Model ${this.modelUrl} is of type Avaturn`);
+
+            this.modelType = this.MODEL_TYPE_AVATURN;
+
+            this.actionMap = ATARIA.ACTION_MAP.readyPlayerMe;
+
+            this.modelBody.root = this.model.getObjectByName("__root__");
+            this.modelBody.head = this.model.getObjectByName("Head_Mesh");
+            this.modelBody.eyeLeft = this.model.getObjectByName("Eye_Mesh");
+            this.modelBody.eyeRight = this.model.getObjectByName("Eye_Mesh");
+            this.modelBody.teeth = this.model.getObjectByName("Teeth_Mesh");
+            this.modelBody.body = this.model.getObjectByName("Body_Mesh");
+            //this.modelBody.outfitBottom = this.model.getObjectByName("Wolf3D_Outfit_Bottom");
+            this.modelBody.footwear = this.model.getObjectByName("avaturn_shoes_0");
+            this.modelBody.outfitTop = this.model.getObjectByName("avaturn_look_0");
+            this.modelBody.hair = this.model.getObjectByName("avaturn_hair_0");
             
             this.modelSkeleton.Neck = this.model.getObjectByName("Neck");
 

@@ -6,6 +6,7 @@ import * as ATARIA from "ataria";
 class SceneManager
 {
     MODEL_TYPE_READY_PLAYER_ME = "readyPlayerMe";
+    MODEL_TYPE_AVATURN = "avaturn";
 
     scene = null;
     camera = null;
@@ -21,7 +22,7 @@ class SceneManager
         this.camera = camera;
         this.options = options ? options : {};
 
-        this.supportedModelTypes = this.options.supportedModelTypes ? this.options.supportedModelTypes : ["readyPlayerMe"];
+        this.supportedModelTypes = this.options.supportedModelTypes ? this.options.supportedModelTypes : ["readyPlayerMe", "avaturn"];
 
         if(options?.debug)
         {   
@@ -198,7 +199,9 @@ class SceneManager
         let targetZ = Math.cos(characterRotationDegs * Math.PI/180) * distance + character.model.position.z;
         let targetX = Math.sin(characterRotationDegs * Math.PI/180) * distance + character.model.position.x;
         
-        let modelEyeHeight = character.modelType == character.model.MODEL_TYPE_READY_PLAYER_ME ? character.modelBody.eyeLeft.geometry.boundingBox.max.y : 1.4;
+        let modelEyeHeight = [character.model.AVATURN, character.model.MODEL_TYPE_READY_PLAYER_ME].includes(character.modelType) ? 
+            character.modelBody.eyeLeft.geometry.boundingBox.max.y : 1.4;
+        
         let lookAtPosition = new THREE.Vector3(character.model.position.x, modelEyeHeight + 0.2, character.model.position.z);
 
         
@@ -245,7 +248,8 @@ class SceneManager
 
         this.debug(`Midpoint between ${characterName1} and ${characterName2} is (${midpointX}, ${midpointZ}).  Camera rotation is ${cameraRotationDegs}.  Character distance is ${characterDistance}`);
 
-        let modelEyeHeight = character1.modelType == character1.model.MODEL_TYPE_READY_PLAYER_ME ? character1.modelBody.eyeLeft.geometry.boundingBox.max.y : 1.4;
+        let modelEyeHeight = [character.model.AVATURN, character.model.MODEL_TYPE_READY_PLAYER_ME].includes(character1.modelType) ? 
+            character1.modelBody.eyeLeft.geometry.boundingBox.max.y : 1.4;
 
         let lookAtPosition = new THREE.Vector3(midpointX, modelEyeHeight - 0.2, midpointZ);
         //let lookAtPosition = new THREE.Vector3(cube.position.x, modelEyeHeight, cube.position.z);
