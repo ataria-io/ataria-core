@@ -100,6 +100,7 @@ class Character
             this.modelBody.footwear = this.model.getObjectByName("avaturn_shoes_0");
             this.modelBody.outfitTop = this.model.getObjectByName("avaturn_look_0");
             this.modelBody.hair = this.model.getObjectByName("avaturn_hair_0");
+            this.modelBody.hair1 = this.model.getObjectByName("avaturn_hair_1");
             
             this.modelSkeleton.Neck = this.model.getObjectByName("Neck");
 
